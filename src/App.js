@@ -1,58 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsers } from "./redux/action";
+import "./App.css";
+import { Flex } from "./components/flexContainer";
+import UserCard from "./components/UserCard";
+import Paginator from "./components/pagination";
+
+import styled from "styled-components";
+
+const LoadingDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  );
+  const [initialPage, setInitialPage] = useState(1);
+  const users = useSelector((state) => state.users);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers(initialPage));
+  }, []);
+
+  const handleFetchUser = (newPageNr) => {
+    dispatch(fetchUsers(newPageNr));
+  };
+
+  const renderUsers = () => {
+    if (users && Array.isArray(users.data) && users.data.length > 0) {
+      const userArray = users.data.map((user) => (
+        <UserCard user={user} key={user.id} />
+      ));
+      return (
+        <>
+          <Flex>{userArray}</Flex>
+          <Paginator
+            handleFetchUser={handleFetchUser}
+            setInitialPage={setInitialPage}
+            initialPage={initialPage}
+          ></Paginator>
+        </>
+      );
+    }
+    return <div>We didnt find the users!</div>;
+  };
+
+  if (users.loading) {
+    return <LoadingDiv>loading...............</LoadingDiv>;
+  }
+
+  return <div className="App">{renderUsers()}</div>;
 }
 
 export default App;
