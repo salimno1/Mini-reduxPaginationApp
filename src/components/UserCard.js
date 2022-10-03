@@ -12,7 +12,7 @@ const ProfileCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgb(240, 240, 240);
+  background-color: ${(props) => props.bg || "red"};
   padding-top: 20px;
   margin: 5px;
   height: 200px;
@@ -33,7 +33,9 @@ const Link = styled.a`
 
 const UserCard = ({ user }) => {
   return (
-    <ProfileCard>
+    <ProfileCard
+      bg={user.id % 2 == 0 ? "rgb(240, 240, 240)" : "rgb(240, 240, 235)"}
+    >
       <AvatarWrapper src={user.avatar} />
       <Name>
         {user.first_name} {"  "}
